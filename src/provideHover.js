@@ -47,8 +47,30 @@ function provideHover(document, position, token) {
 }
 
 module.exports = function(context) {
+
+
 	// 注册鼠标悬停提示
-	context.subscriptions.push(vscode.languages.registerHoverProvider('javascript', {
-		provideHover
-	}));
+
+	const TYPES = [
+		'javascript',
+        'html',
+        'vue'
+    ];
+
+	// 遍历注册插件需要执行的文本类型
+    TYPES.forEach(item => {
+        let providerDisposable = vscode.languages.registerHoverProvider(
+            {
+                scheme: 'file',
+                language: item
+            },
+            {
+				provideHover
+			}
+        );
+        context.subscriptions.push(providerDisposable); // 完成订阅
+    });
+	// context.subscriptions.push(vscode.languages.registerHoverProvider('javascript', {
+	// 	provideHover
+	// }));
 };

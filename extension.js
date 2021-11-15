@@ -8,6 +8,8 @@ const disposable = require('./src/translate')
  */
 
  function provideCompletionItems(document, position) {
+	console.log('zhixingle')
+
 	const line		= document.lineAt(position);
 	const projectPath = getProjectPath(document);
 
@@ -16,7 +18,7 @@ const disposable = require('./src/translate')
 	// const lineText = line.text.substring(0, position.character);
 	const languageJson = require(`${projectPath}/src/language/zh.js`);
 
-	console.log(languageJson, '===')
+	console.log(languageJson, '}}}')
 
 	// 简单匹配，只要当前光标前的字符串为`this.dependencies.`都自动带出所有的依赖
 
@@ -52,10 +54,32 @@ function activate(context) {
 	// 注册翻译 
 	context.subscriptions.push(disposable)
 
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider('javascript', {
-		provideCompletionItems,
-		resolveCompletionItem
-	}, '.'));
+	const TYPES = [
+		'javascript',
+        'html',
+        'vue'
+    ];
+
+	// 遍历注册插件需要执行的文本类型
+    TYPES.forEach(item => {
+        let providerDisposable = vscode.languages.registerCompletionItemProvider(
+            {
+                scheme: 'file',
+                language: item
+            },
+            {
+				provideCompletionItems,
+				resolveCompletionItem
+			}, 
+			'.'
+        );
+        context.subscriptions.push(providerDisposable); // 完成订阅
+    });
+
+	// context.subscriptions.push(vscode.languages.registerCompletionItemProvider(['javascript', 'json', 'jsx', 'typescript'], {
+	// 	provideCompletionItems,
+	// 	resolveCompletionItem
+	// }, '.'));
 
 	// 注册鼠标悬停提示
 	provideHover(context) 
