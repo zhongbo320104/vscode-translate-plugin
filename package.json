@@ -1,0 +1,77 @@
+{
+	"name": "traslate",
+	"displayName": "traslate",
+	"description": "",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.60.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "./extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "translate.zntoen",
+				"title": "翻译"
+			}
+		],
+		"snippets": [
+			{
+				"language": "javascript",
+				"path": "./snippets/index.json"
+			}
+		],
+		"configuration": [
+			{
+				"title": "translateNamed",
+				"properties": {
+					"translate.appid": {
+						"type": "string",
+						"default": "20211115000999584",
+						"description": "百度翻译API-appid"
+					},
+					"translate.secret": {
+						"type": "string",
+						"default": "Qu1XJ7Gns4jGaA6PtvC8",
+						"description": "百度翻译API-密钥"
+					}
+				}
+			}
+		],
+		"icon": "images/icon.png",
+		"menus": {
+			"editor/context": [
+				{
+					"when": "editorHasSelection",
+					"command": "translate.zntoen",
+					"group": "navigation"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"lint": "eslint .",
+		"pretest": "npm run lint",
+		"test": "node ./test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.4",
+		"@types/mocha": "^9.0.0",
+		"@types/node": "14.x",
+		"@types/vscode": "^1.62.0",
+		"@vscode/test-electron": "^1.6.2",
+		"eslint": "^7.32.0",
+		"glob": "^7.1.7",
+		"mocha": "^9.1.1",
+		"typescript": "^4.4.3"
+	},
+	"dependencies": {
+		"axios": "^0.24.0",
+		"md5": "^2.3.0"
+	}
+}

@@ -1,0 +1,9 @@
+{
+	"$t国际化": {
+		"prefix": "$t",
+		"body": [
+		  "$$t('modules${1}')"
+		],
+		"description": "国际化"
+	}
+}
