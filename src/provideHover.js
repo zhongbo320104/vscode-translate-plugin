@@ -53,6 +53,7 @@ module.exports = function(context) {
 
 	const TYPES = [
 		'javascript',
+		'typescript',
         'html',
         'vue'
     ];

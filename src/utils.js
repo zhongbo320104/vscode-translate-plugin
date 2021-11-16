@@ -61,8 +61,10 @@ const util = {
         }
 
         rootPathString = rootPathString.endsWith('/') ? rootPathString.slice(0, rootPathString.length - 1) : rootPathString
-
         projectPath = rootPathString
+        if (os.platform() !== "darwin") {
+            projectPath = rootPathString.startsWith('/') ? rootPathString.slice(1) : rootPathString
+        }
 
         if (!projectPath) {
             this.showError('获取工程根路径异常！');

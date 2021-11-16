@@ -15,10 +15,8 @@ const disposable = require('./src/translate')
 
 	// 只截取到光标位置为止，防止一些特殊情况
 	const lineText = line.text
-	// const lineText = line.text.substring(0, position.character);
-	const languageJson = require(`${projectPath}/src/language/zh.js`);
 
-	console.log(languageJson, '}}}')
+	const languageJson = require(`${projectPath}/src/language/zh.js`);
 
 	// 简单匹配，只要当前光标前的字符串为`this.dependencies.`都自动带出所有的依赖
 
@@ -57,6 +55,7 @@ function activate(context) {
 	const TYPES = [
 		'javascript',
         'html',
+		'typescript',
         'vue'
     ];
 
