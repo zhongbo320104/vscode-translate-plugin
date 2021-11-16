@@ -42,6 +42,7 @@ const disposable = require('./src/translate')
 }
 
 function resolveCompletionItem(item) {
+	console.log('jinlaile ====')
 	if (item.label.indexOf('-') !== -1) [
 		item.label = item.label.split('-')[0] 
 	] 

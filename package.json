@@ -1,10 +1,11 @@
 {
-	"name": "traslate",
-	"displayName": "traslate",
-	"description": "",
-	"version": "0.0.1",
+	"name": "multi-language",
+	"displayName": "multi-language",
+	"description": "多语言代码补全，多语言提示、代码翻译",
+	"version": "0.0.3",
+	"publisher": "bobo320",
 	"engines": {
-		"vscode": "^1.60.0"
+		"vscode": "^1.62.0"
 	},
 	"categories": [
 		"Other"
@@ -13,6 +14,9 @@
 		"*"
 	],
 	"main": "./extension.js",
+
+	"icon": "images/icon.jpg",
+
 	"contributes": {
 		"commands": [
 			{
@@ -43,7 +47,6 @@
 				}
 			}
 		],
-		"icon": "images/icon.png",
 		"menus": {
 			"editor/context": [
 				{
