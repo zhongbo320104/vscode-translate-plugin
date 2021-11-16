@@ -2,7 +2,7 @@
 	"name": "multi-language",
 	"displayName": "multi-language",
 	"description": "多语言代码补全，多语言提示、代码翻译",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"publisher": "bobo320",
 	"engines": {
 		"vscode": "^1.62.0"

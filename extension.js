@@ -16,11 +16,32 @@ const disposable = require('./src/translate')
 	// 只截取到光标位置为止，防止一些特殊情况
 	const lineText = line.text
 
-	const languageJson = require(`${projectPath}/src/language/zh.js`);
+	const jsonConfig = require(`${projectPath}/package.json`);
+	console.log(jsonConfig, "jsonConfig")
+
+	let filePath, baseKey = "modules"
+
+	if (jsonConfig["language-config"]) {
+		// 存在配置
+		filePath = {
+			zh: jsonConfig["language-config"]['zh-path'],
+			en: jsonConfig["language-config"]['en-path'],
+		}
+		baseKey = jsonConfig.baseKey || baseKey
+	} else {
+		filePath = {
+			zh: "src/language/zh.js",
+			en: "src/language/en.js",
+		}
+	}
+
+	const languageJson = require(`${projectPath}/${filePath.zh}`);
+
+	console.log(languageJson, "jsonConfig")
 
 	// 简单匹配，只要当前光标前的字符串为`this.dependencies.`都自动带出所有的依赖
 
-	const moduleskey = Object.keys(languageJson.modules || {})
+	const moduleskey = Object.keys(languageJson[baseKey] || {})
 
 	let matchKey = moduleskey.filter(k => {
 		if (lineText.indexOf(k) !== -1) {
@@ -30,7 +51,7 @@ const disposable = require('./src/translate')
 	})
 
 	if (/\w*\.?\$t/g.test(lineText) && matchKey && matchKey.length > 0) {
-		const matchInnerKey = languageJson.modules[matchKey[0]]
+		const matchInnerKey = languageJson[baseKey][matchKey[0]]
 		return Object.keys(matchInnerKey).map(ik => {
 			return new vscode.CompletionItem(`${ik}-${matchInnerKey[ik]}`, vscode.CompletionItemKind.Field);
 		})
@@ -42,7 +63,6 @@ const disposable = require('./src/translate')
 }
 
 function resolveCompletionItem(item) {
-	console.log('jinlaile ====')
 	if (item.label.indexOf('-') !== -1) [
 		item.label = item.label.split('-')[0] 
 	] 
@@ -50,6 +70,7 @@ function resolveCompletionItem(item) {
 }
 
 function activate(context) {
+	console.log(context, "content")
 	// 注册翻译 
 	context.subscriptions.push(disposable)
 

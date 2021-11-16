@@ -4,10 +4,6 @@ const md5 = require("md5")
 const appid = vscode.workspace.getConfiguration().get("translate.appid")
 const secret = vscode.workspace.getConfiguration().get("translate.secret")
 
-console.log(appid, secret)
-
-console.log('---')
-
 module.exports = {
   /**
    * 翻译方法
