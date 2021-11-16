@@ -22,6 +22,12 @@ vscode 插件
             yyy2: ""
         },
     }
+
+    "language-config": {
+        "zh-path": "src/language/zh.js",
+        "en-path": "src/language/en.js",
+        "baseKey": "modules"
+    },
 ```
 
 
