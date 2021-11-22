@@ -1,6 +1,6 @@
 {
 	"$t国际化": {
-		"prefix": "$t",
+		"prefix": "$m",
 		"body": [
 		  "$$t('modules${1}')"
 		],

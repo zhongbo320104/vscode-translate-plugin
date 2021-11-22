@@ -1,5 +1,53 @@
 const vscode = require('vscode');
 const { getProjectPath } = require('./utils')
+const hf = require('./handleFiles')
+
+let filelanguageDatas
+
+
+const reReadFiles = function (doc) {
+	const projectPath = getProjectPath(doc);
+	console.log(projectPath)
+	// 获取项目配置文件
+	const jsonConfig = require(`${projectPath}/package.json`);
+	if (jsonConfig["language-config"]) {
+		// 存在配置
+		const {
+			ppaths,
+			exportObj
+		} = hf.handlePaths({
+			// 输入入口， 这个地方是一个汇总的入口文件
+			input: jsonConfig["language-config"]["zh-input"],
+		}, projectPath)
+		let reBuildExportObj = []
+		let checks = exportObj.every(item => item.key)
+		let datas = hf.getFileData(ppaths)
+		if (!checks) {
+			// 说明有...
+			exportObj.forEach(item => {
+				if (item.key) {
+					reBuildExportObj.push(item)
+				} else {
+					datas.filter(dot => {
+						for (const key in dot) {
+							if (key === item.value) {
+								reBuildExportObj.push(dot[key])
+							}
+						}
+					})
+				}
+			})
+		}
+		// 读取数据
+		filelanguageDatas = {
+			data: datas,
+			exportObj: reBuildExportObj.length === 0 ? exportObj : reBuildExportObj
+		}
+		return filelanguageDatas
+	} else {
+		// 抛出错误
+	}
+}
 
 /**
  * 鼠标悬停提示，当鼠标停在package.json的dependencies或者devDependencies时，
@@ -10,40 +58,54 @@ const { getProjectPath } = require('./utils')
  */
 function provideHover(document, position, token) {
 	const line		= document.lineAt(position);
-	const projectPath = getProjectPath(document);
+	// const projectPath = getProjectPath(document);
 	const lineText = line.text
-	const languageJson = require(`${projectPath}/src/language/zh.js`);
-	const languageJsonEn = require(`${projectPath}/src/language/en.js`);
+	// console.log(lineText)
 
-    const reg = /\$t\(([\'\"])(\w+)\.(\w+)\.(\w+)(\1)\)/
+	const { data, exportObj } = reReadFiles(document)
+    const reg = /\$t\(([\'\"])(.+)\1\)/
     if (reg.test(lineText)) {
-        let m = lineText.match(reg)
-        const [...data] = [m[2], m[3], m[4]]
-        // 截取中文
-        let md = languageJson[data[0]]
-        let mdKey = md[data[1]]
-        let mdKeyValue = mdKey[data[2]]
+        let m = lineText.match(reg) && lineText.match(reg)[2]
+		if (m) {
+			if (/\./.test(m)) {
+				let hArr = m.split('.')
+				let finalDes = ""
+				exportObj.forEach(item => {
+					if (item.key) {
+						// 有映射
+						if (item.key === hArr[0]) {
+							data.filter(df => {
+								for (const kdf in df) {
+									if (kdf === item.value) {
+										finalDes = getDes(hArr.slice(1), df[kdf])
+										console.log(finalDes, '===')
+									}
+								}
+							})
+						}
+					} else {
+						for (const kk in item) {
+							if (kk === hArr[0]) {
+								// json
+								finalDes = getDes(hArr.slice(1), item)
+							}
+						}
+					}
+				})
+				
+				function getDes(hArr, obj) {
+					let cArr = JSON.parse(JSON.stringify(hArr))
+					let s = ""
+					while (cArr.length > 0) {
+						s = obj[cArr.shift()]
+					}
+					return s
+				}
 
-        // 截取英文
-        let mdEn = languageJsonEn[data[0]]
-        let mdKeyEn = mdEn[data[1]]
-        let mdKeyValueEn = mdKeyEn[data[2]]
-        return new vscode.Hover(`* **中文名为**：${mdKeyValue}\n* **英文名为**：${mdKeyValueEn}`);
+				return new vscode.Hover(`* **中文名为**：${finalDes || '未找到'}`);
+			}
+		}
     }
-
-	// if (/\/package\.json$/.test(fileName)) {
-	// 	console.log('进入provideHover方法');
-	// 	const json = document.getText();
-	// 	if (new RegExp(`"(dependencies|devDependencies)":\\s*?\\{[\\s\\S]*?${word.replace(/\//g, '\\/')}[\\s\\S]*?\\}`, 'gm').test(json)) {
-	// 		let destPath = `${workDir}/node_modules/${word.replace(/"/g, '')}/package.json`;
-	// 		if (fs.existsSync(destPath)) {
-	// 			const content = require(destPath);
-	// 			console.log('hover已生效');
-	// 			// hover内容支持markdown语法
-	// 			return new vscode.Hover(`* **名称**：${content.name}\n* **版本**：${content.version}\n* **许可协议**：${content.license}`);
-	// 		}
-	// 	}
-	// }
 }
 
 module.exports = function(context) {

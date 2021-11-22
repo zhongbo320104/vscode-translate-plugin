@@ -6,12 +6,63 @@ const exec = require('child_process').exec;
 
 const util = {
     /**
-     * 获取当前所在工程根目录，有3种使用方法：<br>
-     * getProjectPath(uri) uri 表示工程内某个文件的路径<br>
-     * getProjectPath(document) document 表示当前被打开的文件document对象<br>
-     * getProjectPath() 会自动从 activeTextEditor 拿document对象，如果没有拿到则报错
-     * @param {*} document 
+     * 
+     * @param {*} str 待清除注释的文件内容
+     * @returns 
      */
+    removeExplain(str) {
+        let reg = /("([^\\\"]*(\\.)?)*")|('([^\\\']*(\\.)?)*')|(\/{2,}.*?(\r|\n|$))|(\/\*(\n|.)*?\*\/)/g;
+        let result = str.replace(reg, function(word) { 
+            // 去除注释后的文本 
+            return /^\/{2,}/.test(word) || /^\/\*/.test(word) ? "" : word; 
+        });
+        return result
+    },
+    /**
+     * 
+     * @param {*} dataObj 来源obj 需要把obj 每一条线路进行记录
+     * @returns 
+     */
+    handleBfs(dataObj) {
+        // 一条路走完的前提是 返回的不是对象
+        let arr = [], needCheck = false, result = []
+        function deepData(val) {
+            if (typeof val !== "object" && val) {
+                result.push({
+                    lang: JSON.parse(JSON.stringify(arr)).join('.'),
+                    label: val
+                })
+                // 查询到一个数据后需要回退， 深度优先遍历的特性
+                arr.pop()
+                needCheck = true
+            } else {
+                // console.log(val)
+                for (const key in val) {
+                    const element = val[key];
+                    // 结果push key 的时候需要判断一下 这是否是一个合法的对象
+                    if (needCheck) checkIfValid(arr, key) 
+                    arr.push(key)
+                    deepData(element, val) 
+                }
+            }
+        }
+
+        function checkIfValid(arr, key) {
+            needCheck = false
+            let oData = JSON.parse(JSON.stringify(dataObj))
+            arr.forEach(d => {
+                oData = oData[d]
+            })
+            if (!oData.hasOwnProperty(key) && arr.length > 0) {
+                arr.pop()
+                checkIfValid(arr, key)
+            }
+        }
+
+        deepData(dataObj)
+
+        return result
+    },
     getProjectPath(document) {
         if (!document) {
             document = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.document : null;
@@ -20,7 +71,7 @@ const util = {
             this.showError('当前激活的编辑器不是文件或者没有文件被打开！');
             return '';
         }
-        const currentFile = (document.uri ? document.uri : document).fsPath;
+        // const currentFile = (document.uri ? document.uri : document).fsPath;
         let projectPath = null;
 
         let workspaceFolders = vscode.workspace.workspaceFolders.map(item => item.uri.path);
@@ -59,6 +110,7 @@ const util = {
                 rootPathString = combineStr
             }
         }
+
 
         rootPathString = rootPathString.endsWith('/') ? rootPathString.slice(0, rootPathString.length - 1) : rootPathString
         projectPath = rootPathString

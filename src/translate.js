@@ -146,16 +146,6 @@ async function handleTranslate(currentSelect, isObj = false) {
     const currentSelect = currentEditor.document.getText(currentEditor.selection)
     if (!currentSelect) return
 
-    console.log(currentSelect, "currentSelect")
-    
-    // if (/^([\'\"]?)\w+(\1)\s*\:\s*([\'\"]?)\w+(\2)$/.test(currentSelect)) {
-    //     // 匹配对象
-    //     selectWord = await handleTranslate(currentSelect, true)
-    // } else {
-    //     // 匹配单一字符串
-    //     selectWord = await handleTranslate(currentSelect)
-    // }
-
     // 匹配单一字符串
     selectWord = await handleTranslate(currentSelect)
 
